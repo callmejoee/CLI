@@ -175,7 +175,12 @@ public class Terminal {
 
     public void chooseCommandAction(String command, String[] args) throws CustomException {
         if (command.equals("mkdir"))
-            mkdir(args);
+        {
+            if(args.length == 0)
+                System.err.println("Usage: mkdir <directory>");
+            else
+                mkdir(args);
+        }            
         else if (command.equals("rmdir"))
             rmdir(args[0]);
         else if (command.equals("touch"))
