@@ -110,8 +110,41 @@ public class Terminal {
         }
     }
 
-    // ___________________________________________________
-    public void chooseCommandAction(String command, String[] args) {
+    // *___________________________________________________
+    public void rm(String fileName) throws CustomException {
+        File file = new File(fileName);
+        if (!file.isFile())
+            throw new CustomException("No Such File!");
+        if (!file.delete())
+            throw new CustomException("Can't Delete File!");
+    }
+
+    // *___________________________________________________
+    public void cat(String[] fileNames) throws CustomException {
+        String result = "";
+        FileManager fileManager = new FileManager();
+        for (String fileName : fileNames) {
+            result += fileManager.read(fileName);
+        }
+        System.out.println(result);
+    }
+
+    // *___________________________________________________
+    public void wc(String fileName) throws CustomException {
+        FileManager fileManager = new FileManager();
+        String fileContent = fileManager.read(fileName);
+        int lineCount = fileContent.split("\n").length;
+        int wordCount = 0;
+        for (String word : fileContent.replace("\n", " ").split(" ")) {
+            if (word.strip().length() > 0) {
+                wordCount++;
+            }
+        }
+        int characterCount = fileContent.replace(" ", "").replace("\n", "").length();
+        System.out.println(String.format("%d %d %d %s", lineCount, wordCount, characterCount, fileName));
+    }
+
+    public void chooseCommandAction(String command, String[] args) throws CustomException {
         switch (command) {
             case "mkdir":
                 mkdir(args);
@@ -124,6 +157,15 @@ public class Terminal {
                 break;
             case "cp":
                 cp(args[0], args[1]);
+                break;
+            case "rm":
+                rm(args[0]);
+                break;
+            case "cat":
+                cat(args);
+                break;
+            case "wc":
+                wc(args[0]);
                 break;
             default:
                 System.out.println("Command \"" + command + "\" not recognized.");
@@ -156,11 +198,18 @@ public class Terminal {
                         System.err.println("Usage: cp <source> <destination>");
                     else if (command.equals("touch"))
                         System.err.println("Usage: touch <Filename>");
+                    else if (command.equals("rm"))
+                        System.err.println("Usage: rm <Filename>");
+                    else if (command.equals("cat"))
+                        System.err.println("Usage: cat <Filename> <Filename2 (optional)>");
+                    else if (command.equals("wc"))
+                        System.err.println("Usage: wc <Filename>");
+                } catch (CustomException e) {
+                    System.out.println(e.getMessage());
                 }
             } else {
                 System.out.println("Invalid input.");
             }
         }
-
     }
 }
