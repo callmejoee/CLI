@@ -1,7 +1,9 @@
-package cli;
+package cli.FileManagers;
 
 import java.io.File;
 import java.util.Scanner;
+
+import cli.CustomExceptions.CustomException;
 
 public class FileManager {
     public String read(String fileName) throws CustomException {

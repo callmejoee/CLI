@@ -4,10 +4,11 @@
  */
 package cli;
 
-import java.io.File;
 import java.io.*;
-import java.io.IOException;
 import java.util.Scanner;
+
+import cli.CustomExceptions.CustomException;
+import cli.FileManagers.FileManager;
 
 /**
  *
@@ -110,7 +111,34 @@ public class Terminal {
         }
     }
 
+    // __________________________________________________
+    public void recursivePathFinder(String source, String destination) throws CustomException {
+        File file = new File(source);
+        if (!file.exists()) {
+            throw new CustomException("Path Not Found.");
+        }
+        File[] subFiles = file.listFiles();
+        for (File subFile : subFiles) {
+            String newSource = source + "\\" + subFile.getName();
+            String newDestination = destination + "\\" + subFile.getName();
+            if (subFile.isFile()) {
+                cp(newSource, newDestination);
+            } else {
+                mkdir(new String[] { newDestination });
+                recursivePathFinder(newSource, newDestination);
+            }
+
+        }
+    }
+    // ?___________________________________________________
+
+    public void cpr(String source, String destination) throws CustomException {
+        String newDestinationParentFolder = destination + "\\" + source;
+        mkdir(new String[] { newDestinationParentFolder });
+        recursivePathFinder(source, newDestinationParentFolder);
+    }
     // *___________________________________________________
+
     public void rm(String fileName) throws CustomException {
         File file = new File(fileName);
         if (!file.isFile())
@@ -118,8 +146,8 @@ public class Terminal {
         if (!file.delete())
             throw new CustomException("Can't Delete File!");
     }
-
     // *___________________________________________________
+
     public void cat(String[] fileNames) throws CustomException {
         String result = "";
         FileManager fileManager = new FileManager();
@@ -128,8 +156,8 @@ public class Terminal {
         }
         System.out.println(result);
     }
-
     // *___________________________________________________
+
     public void wc(String fileName) throws CustomException {
         FileManager fileManager = new FileManager();
         String fileContent = fileManager.read(fileName);
@@ -143,41 +171,37 @@ public class Terminal {
         int characterCount = fileContent.replace(" ", "").replace("\n", "").length();
         System.out.println(String.format("%d %d %d %s", lineCount, wordCount, characterCount, fileName));
     }
+    // *___________________________________________________
 
     public void chooseCommandAction(String command, String[] args) throws CustomException {
-        switch (command) {
-            case "mkdir":
-                mkdir(args);
-                break;
-            case "rmdir":
-                rmdir(args[0]);
-                break;
-            case "touch":
-                touch(args[0]);
-                break;
-            case "cp":
+        if (command.equals("mkdir"))
+            mkdir(args);
+        else if (command.equals("rmdir"))
+            rmdir(args[0]);
+        else if (command.equals("touch"))
+            touch(args[0]);
+        else if (command.equals("cp"))
+            if (args[0].equals("-r"))
+                cpr(args[1], args[2]);
+            else
                 cp(args[0], args[1]);
-                break;
-            case "rm":
-                rm(args[0]);
-                break;
-            case "cat":
-                cat(args);
-                break;
-            case "wc":
-                wc(args[0]);
-                break;
-            default:
-                System.out.println("Command \"" + command + "\" not recognized.");
-        }
+
+        else if (command.equals("rm"))
+            rm(args[0]);
+        else if (command.equals("cat"))
+            cat(args);
+        else if (command.equals("wc"))
+            wc(args[0]);
+        else
+            System.out.println("Command \"" + command + "\" not recognized.");
     }
 
     // ___________________________________________________
     public static void main(String[] args) {
         Terminal terminal = new Terminal();
 
+        Scanner scanner = new Scanner(System.in);
         while (true) {
-            Scanner scanner = new Scanner(System.in);
             System.out.print("> ");
             String input = scanner.nextLine();
             if (input.equals("exit")) {
@@ -195,7 +219,7 @@ public class Terminal {
                     else if (command.equals("rmdir"))
                         System.err.println("Usage: rmdir <directory>");
                     else if (command.equals("cp"))
-                        System.err.println("Usage: cp <source> <destination>");
+                        System.err.println("Usage: cp '-r (recursive)' <source> <destination>");
                     else if (command.equals("touch"))
                         System.err.println("Usage: touch <Filename>");
                     else if (command.equals("rm"))
@@ -211,5 +235,6 @@ public class Terminal {
                 System.out.println("Invalid input.");
             }
         }
+        scanner.close();
     }
 }
