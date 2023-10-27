@@ -24,13 +24,12 @@ public class Terminal {
         this.parser = new Parser();
     }
 
-    public void echo (String[] args) {
+    public void echo(String[] args) {
         String str = String.join(" ", args);
         if (str.startsWith("\"") && str.endsWith("\"")) {
-            str = str.substring(1, str.length()-1);
+            str = str.substring(1, str.length() - 1);
             System.out.println(str);
-        }
-        else {
+        } else {
             System.out.println(str);
         }
     }
@@ -40,35 +39,30 @@ public class Terminal {
         System.out.println(path.toString());
     }
 
-    public void cd(String[] args){
-        if (args.length == 0)
-        {
+    public void cd(String[] args) {
+        if (args.length == 0) {
             String home_dir = System.getProperty("user.home");
             File dir = new File(home_dir);
             System.setProperty("user.dir", dir.getAbsolutePath());
-        }
-        else if (args[0].equals(".."))
-        {
+        } else if (args[0].equals("..")) {
             File dir = new File("..");
             System.setProperty("user.dir", dir.getAbsolutePath());
 
-        }
-        else {
+        } else {
             File dir = new File(args[0]);
             System.setProperty("user.dir", dir.getAbsolutePath());
 
         }
     }
 
-    public void ls(String[] args){
+    public void ls(String[] args) {
         File currentDir = new File(System.getProperty("user.dir"));
         String[] files = currentDir.list();
 
         if (args.length == 0)
             Arrays.sort(files);
 
-        if (args.length == 1 && args[0].equals("-r"))
-        {
+        if (args.length == 1 && args[0].equals("-r")) {
             Collections.reverse(Arrays.asList(files));
         }
 
@@ -139,7 +133,7 @@ public class Terminal {
 
         if (src.exists() && src.isFile()) {
             try (InputStream inputStream = new FileInputStream(src);
-                 OutputStream outputStream = new FileOutputStream(dest)) {
+                    OutputStream outputStream = new FileOutputStream(dest)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -189,7 +183,14 @@ public class Terminal {
     // ?___________________________________________________
 
     public void cpr(String source, String destination) throws CustomException {
-        String newDestinationParentFolder = destination + "\\" + source;
+        File sourceFile = new File(source);
+        File destinationFile = new File(destination);
+        if (!sourceFile.isDirectory())
+            throw new CustomException("Source is not a directory.");
+        if (!destinationFile.isDirectory())
+            throw new CustomException("Destination is not a directory.");
+
+        String newDestinationParentFolder = destination + "\\" + sourceFile.getName();
         mkdir(new String[] { newDestinationParentFolder });
         recursivePathFinder(source, newDestinationParentFolder);
     }
@@ -225,19 +226,18 @@ public class Terminal {
             }
         }
         int characterCount = fileContent.replace(" ", "").replace("\n", "").length();
-        System.out.println(String.format("%d %d %d %s", lineCount, wordCount, characterCount, fileName));
+        System.out.println(
+                String.format("%d %d %d %s", lineCount, wordCount, characterCount, new File(fileName).getName()));
     }
     // *___________________________________________________
 
     public void chooseCommandAction(String command, String[] args) throws CustomException {
-        if (command.equals("mkdir"))
-        {
-            if(args.length == 0)
+        if (command.equals("mkdir")) {
+            if (args.length == 0)
                 System.err.println("Usage: mkdir <directory>");
             else
                 mkdir(args);
-        }
-        else if (command.equals("rmdir"))
+        } else if (command.equals("rmdir"))
             rmdir(args[0]);
         else if (command.equals("touch"))
             touch(args[0]);
