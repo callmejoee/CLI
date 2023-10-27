@@ -15,7 +15,7 @@ import cli.FileManagers.FileManager;
 
 /**
  *
- * @author Seif
+ * @author Seifeldeen Mohamed
  */
 class Parser {
     String commandName;
@@ -50,9 +50,10 @@ class Parser {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 public class Terminal {
     Parser parser;
-
+    File currdir;
     public Terminal() {
         this.parser = new Parser();
+        currdir = new File(System.getProperty("user.dir"));
     }
 
     public void echo(String[] args) {
@@ -65,29 +66,42 @@ public class Terminal {
         }
     }
     // __________________________________________________
-    public void pwd() {
-        Path path = Paths.get("").toAbsolutePath();
-        System.out.println(path.toString());
+    public void pwd() {            
+        System.out.println(currdir.getAbsolutePath());
     }
     // __________________________________________________
     public void cd(String[] args) {
         if (args.length == 0) {
-            String home_dir = System.getProperty("user.home");
-            File dir = new File(home_dir);
+        String home_dir = System.getProperty("user.home");
+        File dir = new File(home_dir);
+        if (dir.exists() && dir.isDirectory()) {
             System.setProperty("user.dir", dir.getAbsolutePath());
+        } else {
+            System.out.println("Home directory does not exist.");
+        }
         } else if (args[0].equals("..")) {
-            File dir = new File("..");
-            System.setProperty("user.dir", dir.getAbsolutePath());
-
+            File previous = new File(this.currdir.getParent());
+            if (previous.exists() && previous.isDirectory()) {
+                this.currdir = previous.getAbsoluteFile();
+            } else {
+                System.out.println("Parent directory does not exist.");
+            }
         } else {
             File dir = new File(args[0]);
-            System.setProperty("user.dir", dir.getAbsolutePath());
-
+            if (!dir.isAbsolute()) {
+                dir = new File(this.currdir.getAbsolutePath(), args[0]);
+            }
+            if (dir.exists() && dir.isDirectory()) {
+                File curr = dir.getAbsoluteFile();
+                this.currdir = curr.getAbsoluteFile();
+            } else {
+                System.out.println("Directory does not exist: " + dir.getAbsolutePath());
+            }
         }
     }
     // __________________________________________________
     public void ls(String[] args) {
-        File currentDir = new File(System.getProperty("user.dir"));
+        File currentDir = this.currdir;
         String[] files = currentDir.list();
 
         if (args.length == 0)
@@ -102,7 +116,7 @@ public class Terminal {
         }
     }
     // __________________________________________________
-    public void mkdir(String[] args) {
+    public void mkdir(String[] args) {                
         for (String arg : args) {
             File dir = new File(arg);
             if (!dir.exists() && !dir.isFile()) {
@@ -155,7 +169,6 @@ public class Terminal {
             }
         }
     }
-
     // __________________________________________________
     public void cp(String source, String destination) {
         File src = new File(source);
@@ -179,6 +192,7 @@ public class Terminal {
 
     // __________________________________________________
     public void touch(String arg) {
+        //String currdir = this.currdir.getAbsolutePath();        
         File file = new File(arg);
         try {
             if (!file.exists()) {
@@ -207,7 +221,6 @@ public class Terminal {
                 mkdir(new String[] { newDestination });
                 recursivePathFinder(newSource, newDestination);
             }
-
         }
     }
     // ?___________________________________________________
