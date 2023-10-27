@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.*;
 import java.io.IOException;
 import java.util.Scanner;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 /**
  *
@@ -14,11 +17,45 @@ import java.util.Scanner;
  */
 public class Terminal {
     Parser parser;
-    
+
     public Terminal()
     {
         this.parser = new Parser();
     }
+
+    //    *-----------------------------------------------*
+
+    public void echo (String[] args) {
+        String str = String.join(" ", args);
+        if (str.startsWith("\"") && str.endsWith("\"")) {
+            str = str.substring(1, str.length()-1);
+            System.out.println(str);
+        }
+            else {
+                System.out.println(str);
+            }
+        }
+
+    public void pwd() {
+        Path path = Paths.get("").toAbsolutePath();
+        System.out.println(path.toString());
+    }
+
+    public void cd(String[] args) {
+        try {
+            if (args.length == 0) {
+            }
+            if (args[0] == "..") {
+
+            } else {
+
+            }
+        }
+        catch (SecurityException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     //__________________________________________________
     public void mkdir(String[] args) {                 
         for (String arg : args) {
@@ -107,6 +144,15 @@ public class Terminal {
     //___________________________________________________
     public void chooseCommandAction(String command, String[] args) {
         switch (command) {
+            case "echo":
+                echo(args);
+                break;
+            case "pwd":
+                pwd();
+                break;
+            case "cd":
+                cd(args);
+                break;
             case "mkdir":
                 mkdir(args);
                 break;
@@ -129,7 +175,7 @@ public class Terminal {
 
         while (true) {            
             Scanner scanner = new Scanner(System.in);
-            System.out.print("> ");
+            System.out.print(">($) ");
             String input = scanner.nextLine();          
             if (input.equals("exit")) {  
                 System.out.println("GoodBye :)");
