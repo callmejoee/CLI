@@ -17,6 +17,37 @@ import cli.FileManagers.FileManager;
  *
  * @author Seif
  */
+class Parser {
+    String commandName;
+    String[] args;
+       
+    public Parser() {
+        this.commandName = "";
+        this.args = new String[0];
+    }
+
+    
+    public boolean parse(String input) {
+        String[] parts = input.trim().split(" ");
+        if (parts.length == 0) {
+            return false;
+        }
+        commandName = parts[0];
+        args = new String[parts.length - 1];
+        System.arraycopy(parts, 1, args, 0, args.length);
+        return true;
+    }
+    
+    public String getCommandName() {        
+        return commandName;
+    }
+    
+    
+    public String[] getArgs() {        
+        return args;
+    }
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 public class Terminal {
     Parser parser;
 
@@ -33,12 +64,12 @@ public class Terminal {
             System.out.println(str);
         }
     }
-
+    // __________________________________________________
     public void pwd() {
         Path path = Paths.get("").toAbsolutePath();
         System.out.println(path.toString());
     }
-
+    // __________________________________________________
     public void cd(String[] args) {
         if (args.length == 0) {
             String home_dir = System.getProperty("user.home");
@@ -54,7 +85,7 @@ public class Terminal {
 
         }
     }
-
+    // __________________________________________________
     public void ls(String[] args) {
         File currentDir = new File(System.getProperty("user.dir"));
         String[] files = currentDir.list();
@@ -70,12 +101,11 @@ public class Terminal {
             System.out.println(fileName);
         }
     }
-
     // __________________________________________________
     public void mkdir(String[] args) {
         for (String arg : args) {
             File dir = new File(arg);
-            if (!dir.exists()) {
+            if (!dir.exists() && !dir.isFile()) {
                 dir.mkdirs();
             } else {
                 System.out.println("Directory " + arg + " already exists");
