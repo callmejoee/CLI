@@ -6,6 +6,9 @@ package cli;
 
 import java.io.*;
 import java.util.Scanner;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 import cli.CustomExceptions.CustomException;
 import cli.FileManagers.FileManager;
@@ -17,12 +20,55 @@ import cli.FileManagers.FileManager;
 public class Terminal {
     Parser parser;
 
+<<<<<<< HEAD
+    public Terminal()
+    {
+        this.parser = new Parser();
+    }
+
+    //    *-----------------------------------------------*
+
+    public void echo (String[] args) {
+        String str = String.join(" ", args);
+        if (str.startsWith("\"") && str.endsWith("\"")) {
+            str = str.substring(1, str.length()-1);
+            System.out.println(str);
+        }
+            else {
+                System.out.println(str);
+            }
+        }
+
+    public void pwd() {
+        Path path = Paths.get("").toAbsolutePath();
+        System.out.println(path.toString());
+    }
+
+    public void cd(String[] args) {
+        try {
+            if (args.length == 0) {
+            }
+            if (args[0] == "..") {
+
+            } else {
+
+            }
+        }
+        catch (SecurityException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //__________________________________________________
+    public void mkdir(String[] args) {
+=======
     public Terminal() {
         this.parser = new Parser();
     }
 
     // __________________________________________________
     public void mkdir(String[] args) {
+>>>>>>> 0cea15138aa992387184865f313d488d0dab0ee4
         for (String arg : args) {
             File dir = new File(arg);
             if (!dir.exists()) {
@@ -83,7 +129,7 @@ public class Terminal {
 
         if (src.exists() && src.isFile()) {
             try (InputStream inputStream = new FileInputStream(src);
-                 OutputStream outputStream = new FileOutputStream(dest)) {
+                    OutputStream outputStream = new FileOutputStream(dest)) {
                 byte[] buffer = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -110,6 +156,34 @@ public class Terminal {
             System.out.println("Failed to create file: " + arg);
         }
     }
+<<<<<<< HEAD
+    //___________________________________________________
+    public void chooseCommandAction(String command, String[] args) {
+        switch (command) {
+            case "echo":
+                echo(args);
+                break;
+            case "pwd":
+                pwd();
+                break;
+            case "cd":
+                cd(args);
+                break;
+            case "mkdir":
+                mkdir(args);
+                break;
+            case "rmdir":
+                rmdir(args[0]);
+                break;
+            case "touch":
+                touch(args[0]);
+                break;
+            case "cp":
+                cp(args[0], args[1]);
+                break;
+            default:
+                System.out.println("Command \"" + command + "\" not recognized.");
+=======
 
     // __________________________________________________
     public void recursivePathFinder(String source, String destination) throws CustomException {
@@ -128,6 +202,7 @@ public class Terminal {
                 recursivePathFinder(newSource, newDestination);
             }
 
+>>>>>>> 0cea15138aa992387184865f313d488d0dab0ee4
         }
     }
     // ?___________________________________________________
