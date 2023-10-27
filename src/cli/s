@@ -6,8 +6,7 @@ package cli;
 
 import java.io.*;
 import java.util.Scanner;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+i
 
 
 import cli.CustomExceptions.CustomException;
@@ -28,21 +27,6 @@ public class Terminal {
 
     //    *-----------------------------------------------*
 
-    public void echo (String[] args) {
-        String str = String.join(" ", args);
-        if (str.startsWith("\"") && str.endsWith("\"")) {
-            str = str.substring(1, str.length()-1);
-            System.out.println(str);
-        }
-            else {
-                System.out.println(str);
-            }
-        }
-
-    public void pwd() {
-        Path path = Paths.get("").toAbsolutePath();
-        System.out.println(path.toString());
-    }
 
     public void cd(String[] args) {
         try {

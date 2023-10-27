@@ -5,8 +5,11 @@
 package cli;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
-
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import cli.CustomExceptions.CustomException;
 import cli.FileManagers.FileManager;
 
@@ -19,6 +22,59 @@ public class Terminal {
 
     public Terminal() {
         this.parser = new Parser();
+    }
+
+    public void echo (String[] args) {
+        String str = String.join(" ", args);
+        if (str.startsWith("\"") && str.endsWith("\"")) {
+            str = str.substring(1, str.length()-1);
+            System.out.println(str);
+        }
+        else {
+            System.out.println(str);
+        }
+    }
+
+    public void pwd() {
+        Path path = Paths.get("").toAbsolutePath();
+        System.out.println(path.toString());
+    }
+
+    public void cd(String[] args){
+        if (args.length == 0)
+        {
+            String home_dir = System.getProperty("user.home");
+            File dir = new File(home_dir);
+            System.setProperty("user.dir", dir.getAbsolutePath());
+        }
+        else if (args[0].equals(".."))
+        {
+            File dir = new File("..");
+            System.setProperty("user.dir", dir.getAbsolutePath());
+
+        }
+        else {
+            File dir = new File(args[0]);
+            System.setProperty("user.dir", dir.getAbsolutePath());
+
+        }
+    }
+
+    public void ls(String[] args){
+        File currentDir = new File(System.getProperty("user.dir"));
+        String[] files = currentDir.list();
+
+        if (args.length == 0)
+            Arrays.sort(files);
+
+        if (args.length == 1 && args[0].equals("-r"))
+        {
+            Collections.reverse(Arrays.asList(files));
+        }
+
+        for (String fileName : files) {
+            System.out.println(fileName);
+        }
     }
 
     // __________________________________________________
@@ -197,7 +253,16 @@ public class Terminal {
             cat(args);
         else if (command.equals("wc"))
             wc(args[0]);
-        else
+        else if (command.equals("echo"))
+            echo(args);
+        else if (command.equals("pwd")) {
+            pwd();
+        } else if (command.equals("cd")) {
+            cd(args);
+
+        } else if (command.equals("ls")) {
+            ls(args);
+        } else
             System.out.println("Command \"" + command + "\" not recognized.");
     }
 
