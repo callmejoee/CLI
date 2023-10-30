@@ -8,8 +8,6 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import cli.CustomExceptions.CustomException;
 import cli.FileManagers.FileManager;
 
@@ -87,7 +85,7 @@ public class Terminal {
                 System.out.println("Parent directory does not exist.");
             }
         } else {
-            File dir = new File(args[0]);
+            File dir = new File(args[0]);            
             if (!dir.isAbsolute()) {
                 dir = new File(this.currdir.getAbsolutePath(), args[0]);
             }
@@ -118,7 +116,7 @@ public class Terminal {
     // __________________________________________________
     public void mkdir(String[] args) {                
         for (String arg : args) {
-            File dir = new File(arg);
+            File dir = new File(currdir,arg);
             if (!dir.exists() && !dir.isFile()) {
                 dir.mkdirs();
             } else {
@@ -135,7 +133,7 @@ public class Terminal {
         } else if (arg.length() == 0) {
             System.err.println("Usage: rmdir <directory>");
         } else {
-            File dir = new File(arg);
+            File dir = new File(currdir,arg);
 
             if (dir.exists() && dir.isDirectory()) {
                 if (isEmpty(dir)) {
@@ -191,9 +189,8 @@ public class Terminal {
     }
 
     // __________________________________________________
-    public void touch(String arg) {
-        //String currdir = this.currdir.getAbsolutePath();        
-        File file = new File(arg);
+    public void touch(String arg) {               
+        File file = new File(currdir,arg);
         try {
             if (!file.exists()) {
                 file.createNewFile();
