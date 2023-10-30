@@ -49,6 +49,15 @@ public class Terminal {
     Parser parser;
     File currdir;
 
+    // !___________________________________________________
+    private String normalizePath(String path) {
+        File file = new File(path);
+        if (file.isAbsolute())
+            return path;
+        return currdir.getAbsolutePath() + "\\" + path;
+    }
+    // !___________________________________________________
+
     public Terminal() {
         this.parser = new Parser();
         currdir = new File(System.getProperty("user.dir"));
@@ -87,13 +96,9 @@ public class Terminal {
                 System.out.println("Parent directory does not exist.");
             }
         } else {
-            File dir = new File(args[0]);
-            if (!dir.isAbsolute()) {
-                dir = new File(this.currdir.getAbsolutePath(), args[0]);
-            }
+            File dir = new File(normalizePath(args[0]));
             if (dir.exists() && dir.isDirectory()) {
-                File curr = dir.getAbsoluteFile();
-                this.currdir = curr.getAbsoluteFile();
+                this.currdir = dir.getAbsoluteFile();
             } else {
                 System.out.println("Directory does not exist: " + dir.getAbsolutePath());
             }
@@ -137,7 +142,7 @@ public class Terminal {
         } else if (arg.length() == 0) {
             System.err.println("Usage: rmdir <directory>");
         } else {
-            File dir = new File(currdir, arg);
+            File dir = new File(normalizePath(arg));
 
             if (dir.exists() && dir.isDirectory()) {
                 if (isEmpty(dir)) {
@@ -174,8 +179,8 @@ public class Terminal {
 
     // __________________________________________________
     public void cp(String source, String destination) {
-        File src = new File(source);
-        File dest = new File(destination);
+        File src = new File(normalizePath(source));
+        File dest = new File(normalizePath(source));
 
         if (src.exists() && src.isFile()) {
             try (InputStream inputStream = new FileInputStream(src);
@@ -195,7 +200,7 @@ public class Terminal {
 
     // __________________________________________________
     public void touch(String arg) {
-        File file = new File(currdir, arg);
+        File file = new File(normalizePath(arg));
         try {
             if (!file.exists()) {
                 file.createNewFile();
@@ -225,15 +230,6 @@ public class Terminal {
             }
         }
     }
-    // ?___________________________________________________
-
-    public String normalizePath(String path) {
-        File file = new File(path);
-        if (file.isAbsolute())
-            return path;
-        return currdir + "\\" + path;
-    }
-    // ?___________________________________________________
 
     public void cpr(String source, String destination) throws CustomException {
         File sourceFile = new File(normalizePath(source));
@@ -244,7 +240,6 @@ public class Terminal {
             throw new CustomException("Destination is not a directory.");
 
         String newDestinationParentFolder = normalizePath(destination) + "\\" + sourceFile.getName();
-        System.out.println(newDestinationParentFolder);
         mkdir(new String[] { newDestinationParentFolder });
         recursivePathFinder(normalizePath(source), newDestinationParentFolder);
     }
