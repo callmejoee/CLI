@@ -18,13 +18,12 @@ import cli.FileManagers.FileManager;
 class Parser {
     String commandName;
     String[] args;
-       
+
     public Parser() {
         this.commandName = "";
         this.args = new String[0];
     }
 
-    
     public boolean parse(String input) {
         String[] parts = input.trim().split(" ");
         if (parts.length == 0) {
@@ -35,20 +34,21 @@ class Parser {
         System.arraycopy(parts, 1, args, 0, args.length);
         return true;
     }
-    
-    public String getCommandName() {        
+
+    public String getCommandName() {
         return commandName;
     }
-    
-    
-    public String[] getArgs() {        
+
+    public String[] getArgs() {
         return args;
     }
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 public class Terminal {
     Parser parser;
     File currdir;
+
     public Terminal() {
         this.parser = new Parser();
         currdir = new File(System.getProperty("user.dir"));
@@ -63,20 +63,22 @@ public class Terminal {
             System.out.println(str);
         }
     }
+
     // __________________________________________________
-    public void pwd() {            
+    public void pwd() {
         System.out.println(currdir.getAbsolutePath());
     }
+
     // __________________________________________________
     public void cd(String[] args) {
         if (args.length == 0) {
-        String home_dir = System.getProperty("user.home");
-        File dir = new File(home_dir);
-        if (dir.exists() && dir.isDirectory()) {
-            System.setProperty("user.dir", dir.getAbsolutePath());
-        } else {
-            System.out.println("Home directory does not exist.");
-        }
+            String home_dir = System.getProperty("user.home");
+            File dir = new File(home_dir);
+            if (dir.exists() && dir.isDirectory()) {
+                System.setProperty("user.dir", dir.getAbsolutePath());
+            } else {
+                System.out.println("Home directory does not exist.");
+            }
         } else if (args[0].equals("..")) {
             File previous = new File(this.currdir.getParent());
             if (previous.exists() && previous.isDirectory()) {
@@ -85,7 +87,7 @@ public class Terminal {
                 System.out.println("Parent directory does not exist.");
             }
         } else {
-            File dir = new File(args[0]);            
+            File dir = new File(args[0]);
             if (!dir.isAbsolute()) {
                 dir = new File(this.currdir.getAbsolutePath(), args[0]);
             }
@@ -97,6 +99,7 @@ public class Terminal {
             }
         }
     }
+
     // __________________________________________________
     public void ls(String[] args) {
         File currentDir = this.currdir;
@@ -113,10 +116,11 @@ public class Terminal {
             System.out.println(fileName);
         }
     }
+
     // __________________________________________________
-    public void mkdir(String[] args) {                
+    public void mkdir(String[] args) {
         for (String arg : args) {
-            File dir = new File(currdir,arg);
+            File dir = new File(normalizePath(arg));
             if (!dir.exists() && !dir.isFile()) {
                 dir.mkdirs();
             } else {
@@ -133,7 +137,7 @@ public class Terminal {
         } else if (arg.length() == 0) {
             System.err.println("Usage: rmdir <directory>");
         } else {
-            File dir = new File(currdir,arg);
+            File dir = new File(currdir, arg);
 
             if (dir.exists() && dir.isDirectory()) {
                 if (isEmpty(dir)) {
@@ -167,6 +171,7 @@ public class Terminal {
             }
         }
     }
+
     // __________________________________________________
     public void cp(String source, String destination) {
         File src = new File(source);
@@ -189,8 +194,8 @@ public class Terminal {
     }
 
     // __________________________________________________
-    public void touch(String arg) {               
-        File file = new File(currdir,arg);
+    public void touch(String arg) {
+        File file = new File(currdir, arg);
         try {
             if (!file.exists()) {
                 file.createNewFile();
@@ -222,22 +227,31 @@ public class Terminal {
     }
     // ?___________________________________________________
 
+    public String normalizePath(String path) {
+        File file = new File(path);
+        if (file.isAbsolute())
+            return path;
+        return currdir + "\\" + path;
+    }
+    // ?___________________________________________________
+
     public void cpr(String source, String destination) throws CustomException {
-        File sourceFile = new File(source);
-        File destinationFile = new File(destination);
+        File sourceFile = new File(normalizePath(source));
+        File destinationFile = new File(normalizePath(destination));
         if (!sourceFile.isDirectory())
             throw new CustomException("Source is not a directory.");
         if (!destinationFile.isDirectory())
             throw new CustomException("Destination is not a directory.");
 
-        String newDestinationParentFolder = destination + "\\" + sourceFile.getName();
+        String newDestinationParentFolder = normalizePath(destination) + "\\" + sourceFile.getName();
+        System.out.println(newDestinationParentFolder);
         mkdir(new String[] { newDestinationParentFolder });
-        recursivePathFinder(source, newDestinationParentFolder);
+        recursivePathFinder(normalizePath(source), newDestinationParentFolder);
     }
     // *___________________________________________________
 
     public void rm(String fileName) throws CustomException {
-        File file = new File(fileName);
+        File file = new File(normalizePath(fileName));
         if (!file.isFile())
             throw new CustomException("No Such File!");
         if (!file.delete())
@@ -249,7 +263,7 @@ public class Terminal {
         String result = "";
         FileManager fileManager = new FileManager();
         for (String fileName : fileNames) {
-            result += fileManager.read(fileName);
+            result += fileManager.read(normalizePath(fileName));
         }
         System.out.println(result);
     }
@@ -257,7 +271,7 @@ public class Terminal {
 
     public void wc(String fileName) throws CustomException {
         FileManager fileManager = new FileManager();
-        String fileContent = fileManager.read(fileName);
+        String fileContent = fileManager.read(normalizePath(fileName));
         int lineCount = fileContent.split("\n").length;
         int wordCount = 0;
         for (String word : fileContent.replace("\n", " ").split(" ")) {
@@ -267,7 +281,8 @@ public class Terminal {
         }
         int characterCount = fileContent.replace(" ", "").replace("\n", "").length();
         System.out.println(
-                String.format("%d %d %d %s", lineCount, wordCount, characterCount, new File(fileName).getName()));
+                String.format("%d %d %d %s", lineCount, wordCount, characterCount,
+                        new File(normalizePath(fileName)).getName()));
     }
     // *___________________________________________________
 
