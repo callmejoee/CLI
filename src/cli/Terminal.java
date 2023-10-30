@@ -137,7 +137,7 @@ public class Terminal {
     // __________________________________________________
     public void rmdir(String arg) {
         if (arg.equals("*")) {
-            File currentDirs = new File(System.getProperty("user.dir"));
+            File currentDirs = new File(currdir.getAbsolutePath());
             removeAll(currentDirs);
         } else if (arg.length() == 0) {
             System.err.println("Usage: rmdir <directory>");
