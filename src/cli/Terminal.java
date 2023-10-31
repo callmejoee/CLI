@@ -10,6 +10,10 @@ import java.util.Collections;
 import java.util.Scanner;
 import cli.CustomExceptions.CustomException;
 import cli.FileManagers.FileManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -27,13 +31,13 @@ class Parser {
     public boolean parse(String input) {
         String[] parts = input.trim().split(" ");
         if (parts.length == 0) {
-            return false;
-        }
+        return false;
+    }
         commandName = parts[0];
         args = new String[parts.length - 1];
         System.arraycopy(parts, 1, args, 0, args.length);
-        return true;
-    }
+    return true;
+}
 
     public String getCommandName() {
         return commandName;
@@ -77,7 +81,6 @@ public class Terminal {
     public void pwd() {
         System.out.println(currdir.getAbsolutePath());
     }
-
     // __________________________________________________
     public void cd(String[] args) {
         if (args.length == 0) {
@@ -96,7 +99,8 @@ public class Terminal {
                 System.out.println("Parent directory does not exist.");
             }
         } else {
-            File dir = new File(normalizePath(args[0]));
+            String path = String.join(" ", args);
+            File dir = new File(normalizePath(path));
             if (dir.exists() && dir.isDirectory()) {
                 this.currdir = dir.getAbsoluteFile();
             } else {
