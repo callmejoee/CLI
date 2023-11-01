@@ -128,16 +128,29 @@ public class Terminal {
 
     // __________________________________________________
     public void mkdir(String[] args) {
-        for (String arg : args) {
-            File dir = new File(normalizePath(arg));
+        if(args.length > 0 && args[0].matches("^[A-Z]:\\\\.*"))
+        {            
+            String combinedPath = String.join(" ", args);
+            File dir = new File(normalizePath(combinedPath));
+
             if (!dir.exists() && !dir.isFile()) {
-                dir.mkdirs();
+                dir.mkdirs();                
             } else {
-                System.out.println("Directory " + arg + " already exists");
+                System.out.println("Directory " + combinedPath + " already exists.");
             }
         }
+        else
+        {
+            for (String arg : args) {
+                File dir = new File(normalizePath(arg));
+                if (!dir.exists() && !dir.isFile()) {                    
+                    dir.mkdirs();
+                } else {
+                    System.out.println("Directory " + arg + " already exists");
+                }
+            }
+        }        
     }
-
     // __________________________________________________
     public void rmdir(String arg) {
         if (arg.equals("*")) {
@@ -203,7 +216,7 @@ public class Terminal {
     }
 
     // __________________________________________________
-    public void touch(String arg) {
+    public void touch(String arg) {        
         File file = new File(normalizePath(arg));
         try {
             if (!file.exists()) {
@@ -214,8 +227,8 @@ public class Terminal {
         } catch (IOException e) {
             System.out.println("Failed to create file: " + arg);
         }
-    }
-
+    }    
+    
     // __________________________________________________
     public void recursivePathFinder(String source, String destination) throws CustomException {
         File file = new File(source);
@@ -293,7 +306,7 @@ public class Terminal {
                 mkdir(args);
         } else if (command.equals("rmdir"))
             rmdir(args[0]);
-        else if (command.equals("touch"))
+        else if (command.equals("touch"))            
             touch(args[0]);
         else if (command.equals("cp"))
             if (args[0].equals("-r"))
