@@ -87,7 +87,7 @@ public class Terminal {
             String home_dir = System.getProperty("user.home");
             File dir = new File(home_dir);
             if (dir.exists() && dir.isDirectory()) {
-                System.setProperty("user.dir", dir.getAbsolutePath());
+                this.currdir = dir.getAbsoluteFile();
             } else {
                 System.out.println("Home directory does not exist.");
             }
